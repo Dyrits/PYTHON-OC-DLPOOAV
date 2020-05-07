@@ -50,7 +50,7 @@ class Zone:
         return len(self.inhabitants)
 
     @classmethod
-    def initialize_zones(cls):
+    def _initialize_zones(cls):
         for latitude in range(cls.MIN_LATITUDE, cls.MAX_LATITUDE, cls.DEGREE_HEIGHT):
             for longitude in range(cls.MIN_LONGITUDE, cls.MAX_LONGITUDE, cls.DEGREE_WIDTH):
                 zone = Zone(Position(latitude, longitude),
@@ -59,6 +59,8 @@ class Zone:
     
     @classmethod
     def find_zone_of_position(cls, position):
+        if not cls.ZONES:
+            cls._initialize_zones()
         #The zone is made of 64800 zones, (from 0 to 64799), wich can be divided in 180 rows and 360 columns.
         # Longitude index:
         longitude_index = int((position.longitude_degrees - cls.MIN_LONGITUDE) / cls.DEGREE_WIDTH) # position.longitude_degree = -50 >> 130
@@ -75,7 +77,6 @@ class Zone:
         
 
 def main():
-    Zone.initialize_zones()
     with open("agents-100k.json", "r") as agents:
         agents = json.load(agents)          
         for agent_attributes in agents:
@@ -85,7 +86,6 @@ def main():
             agent = Agent(position, **agent_attributes)
             zone = Zone.find_zone_of_position(position)
             zone.add_inhabitant(agent)
-            print("Zone population: ", zone.population)
 
         
 
