@@ -50,37 +50,36 @@ class Zone:
                 zone = Zone(Position(latitude, longitude),
                             Position(latitude + 1, longitude + 1))
                 cls.ZONES.append(zone)
-                
+    
     @classmethod
     def find_zone_of_position(cls, position):
-        #The zone is made of 64800 zones, wich can be divided in 180 rows and 360 columns.
+        #The zone is made of 64800 zones, (from 0 to 64799), wich can be divided in 180 rows and 360 columns.
         # Longitude index:
-        longitude_index = int((position.longitude_degree - cls.MIN_LONGITUDE) / cls.DEGREE_WIDTH) # position.longitude_degree (-50) >> 130
+        longitude_index = int((position.longitude_degrees - cls.MIN_LONGITUDE) / cls.DEGREE_WIDTH) # position.longitude_degree = -50 >> 130
         # Number of columns per row:
         longitude_degrees = int((cls.MAX_LONGITUDE - cls.MIN_LONGITUDE) / cls.DEGREE_WIDTH)  # 360
         # Latitude row:
-        latitude_row = int((position.latitude_degrees - cls.MIN_LATITUDE) / cls.DEGREE_HEIGHT) # position.latitude_degree (5) >> 95
+        latitude_row = int((position.latitude_degrees - cls.MIN_LATITUDE) / cls.DEGREE_HEIGHT) # position.latitude_degree = 5 >> 95
         # There is {longitude_degrees} (360) index between two {latitude_row}.
-        # Latitude index:
-        latitude_index = latitude_row * longitude_degrees # position.latitude_degree (5) >> 95 * 360 = 34 200
+        # Laitude index:
+        latitude_index = latitude_row * longitude_degrees # position.latitude_degree = 5 >> 95 * 360 = 34 200
         index_zone = latitude_index + longitude_index  # position(5, -50) >> 34200 + 130 = 34330
+        assert (index_zone < 64800 and index_zone > -1)
+        return cls.ZONES[index_zone]
         
-        
-        
-
 
 def main():
+    Zone.initialize_zones()
     with open("agents-100k.json", "r") as agents:
-        agents = json.load(agents)
+        agents = json.load(agents)          
         for agent_attributes in agents:
+            print("Test")
             latitude = agent_attributes.pop("latitude")
             longitude = agent_attributes.pop("longitude")
             position = Position(latitude, longitude)
             agent = Agent(position, **agent_attributes)
-            Zone.initialize_zones()
-            print(len(Zone.ZONES))
-        
 
+        
 
 if __name__ == "__main__":
     main()
