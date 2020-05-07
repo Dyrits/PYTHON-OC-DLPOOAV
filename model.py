@@ -41,7 +41,13 @@ class Zone:
         self.lb_corner = left_bottom_corner
         self.rt_corner = right_top_corner
         self.inhabitants = []
-        self.population = 0
+        
+    def add_inhabitant(self, inhabitant):
+        self.inhabitants.append(inhabitant)
+        
+    @property
+    def population(self):
+        return len(self.inhabitants)
 
     @classmethod
     def initialize_zones(cls):
@@ -73,11 +79,13 @@ def main():
     with open("agents-100k.json", "r") as agents:
         agents = json.load(agents)          
         for agent_attributes in agents:
-            print("Test")
             latitude = agent_attributes.pop("latitude")
             longitude = agent_attributes.pop("longitude")
             position = Position(latitude, longitude)
             agent = Agent(position, **agent_attributes)
+            zone = Zone.find_zone_of_position(position)
+            zone.add_inhabitant(agent)
+            print("Zone population: ", zone.population)
 
         
 
